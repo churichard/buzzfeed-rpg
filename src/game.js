@@ -1,37 +1,48 @@
-// You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
-// which will try to choose the best renderer for the environment you are in.
-var renderer = new PIXI.autoDetectRenderer(800, 600);
+var renderer; // The game renderer
+var stage; // The root container that holds the scene
+var mainChar; // The main character sprite
 
-// The renderer will create a canvas element for you that you can then insert into the DOM.
-document.body.appendChild(renderer.view);
+function init() {
+    // Initialize the renderer
+    renderer = new PIXI.autoDetectRenderer(800, 600);
+    renderer.backgroundColor = 0xFFFFFF;
 
-// You need to create a root container that will hold the scene you want to draw.
-var stage = new PIXI.Container();
+    // The renderer will create a canvas element for you that you can then insert into the DOM.
+    document.body.appendChild(renderer.view);
 
-// This creates a texture from a 'bunny.png' image.
-var bunnyTexture = PIXI.Texture.fromImage('assets/person.png');
-var bunny = new PIXI.Sprite(bunnyTexture);
+    // Initialize the stage
+    stage = new PIXI.Container();
 
-// Setup the position and scale of the bunny
-bunny.position.x = 400;
-bunny.position.y = 300;
+    // Create the main char texture and sprite
+    var mainCharTexture = PIXI.Texture.fromImage('assets/person.png');
+    mainChar = new PIXI.Sprite(mainCharTexture);
 
-bunny.scale.x = 2;
-bunny.scale.y = 2;
+    // Setup the position and scale of the main char
+    mainChar.position.x = 400;
+    mainChar.position.y = 300;
 
-// Add the bunny to the scene we are building.
-stage.addChild(bunny);
+    mainChar.anchor.x = 0.5;
+    mainChar.anchor.y = 0.5;
 
-// kick off the animation loop (defined below)
-animate();
+    mainChar.scale.x = 1;
+    mainChar.scale.y = 1;
+
+    // Add the main char to the scene we are building.
+    stage.addChild(mainChar);
+
+    // Start the animation loop
+    animate();
+}
 
 function animate() {
-    // start the timer for the next animation loop
+    // Start the timer for the next animation loop
     requestAnimationFrame(animate);
 
-    // each frame we spin the bunny around a bit
-    bunny.rotation += 0.01;
+    // Each frame we spin the main char around a bit
+    mainChar.rotation += 0.1;
 
-    // this is the main render call that makes pixi draw your container and its children.
+    // The main render call that makes pixi draw the container and its children.
     renderer.render(stage);
 }
+
+init();
