@@ -1,8 +1,13 @@
+// Game stuff
 var renderer; // The game renderer
 var stage; // The root container that holds the scene
-var mainChar; // The main character sprite
 var xScreenBound; // The x bound for the main char
 var yScreenBound; // The y bound for the main char
+// Sprites
+var ground; // The ground of the scene
+var mainChar; // The main character sprite
+// Misc
+var restingHeight; // The resting height of the main char
 
 // Initializes variables
 function init() {
@@ -27,6 +32,16 @@ function setupRendererAndStage() {
 
     // Initialize the stage
     stage = new PIXI.Container();
+
+    // Initialize the ground
+    var groundTexture = PIXI.Texture.fromImage('assets/ground.png');
+    ground = new PIXI.Sprite(groundTexture);
+    ground.texture.baseTexture.on('loaded', function(){
+        ground.x = 0;
+        ground.y = renderer.height - ground.height;
+    });
+
+    stage.addChild(ground);
 }
 
 // Sets up the main char
@@ -35,16 +50,18 @@ function setupMainChar() {
     var mainCharTexture = PIXI.Texture.fromImage('assets/person.png');
     mainChar = new PIXI.Sprite(mainCharTexture);
 
-    // Setup the screen bounds
     mainChar.texture.baseTexture.on('loaded', function(){
+        // Set the screen bounds
         xScreenBound = renderer.width - mainChar.width;
         yScreenBound = renderer.height - mainChar.height;
+
+        // Set the position of the main char
+        restingHeight = renderer.height - ground.height - mainChar.height;
+        mainChar.x = 100;
+        mainChar.y = restingHeight;
     });
 
-    // Setup the position and velocity of the main char
-    mainChar.x = 400;
-    mainChar.y = 300;
-
+    // Set the velocity of the main char
     mainChar.vx = 0;
     mainChar.vy = 0;
 
@@ -115,6 +132,10 @@ function updateState() {
     } else if (mainChar.y >= yScreenBound) {
         mainChar.y = yScreenBound;
     }
+
+    if (hitTestRectangle(mainChar, ground)) {
+        mainChar.y = restingHeight;
+    }
 }
 
 function keyboard(keyCode) {
@@ -147,13 +168,58 @@ function keyboard(keyCode) {
 
     //Attach event listeners
     window.addEventListener(
-        "keydown", key.downHandler.bind(key), false
-        );
+        "keydown", key.downHandler.bind(key), false);
     window.addEventListener(
-        "keyup", key.upHandler.bind(key), false
-        );
+        "keyup", key.upHandler.bind(key), false);
 
     return key;
 }
 
+function hitTestRectangle(r1, r2) {
+    //Define the variables we'll need to calculate
+    var hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+
+    //hit will determine whether there's a collision
+    hit = false;
+
+    //Find the center points of each sprite
+    r1.centerX = r1.x + r1.width / 2;
+    r1.centerY = r1.y + r1.height / 2;
+    r2.centerX = r2.x + r2.width / 2;
+    r2.centerY = r2.y + r2.height / 2;
+
+    //Find the half-widths and half-heights of each sprite
+    r1.halfWidth = r1.width / 2;
+    r1.halfHeight = r1.height / 2;
+    r2.halfWidth = r2.width / 2;
+    r2.halfHeight = r2.height / 2;
+
+    //Calculate the distance vector between the sprites
+    vx = r1.centerX - r2.centerX;
+    vy = r1.centerY - r2.centerY;
+
+    //Figure out the combined half-widths and half-heights
+    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+    //Check for a collision on the x axis
+    if (Math.abs(vx) < combinedHalfWidths) {
+        //A collision might be occuring. Check for a collision on the y axis
+        if (Math.abs(vy) < combinedHalfHeights) {
+           //There's definitely a collision happening
+           hit = true;
+        } else {
+           //There's no collision on the y axis
+           hit = false;
+        }
+    } else {
+        //There's no collision on the x axis
+        hit = false;
+    }
+
+    //`hit` will be either `true` or `false`
+    return hit;
+};
+
+// Initialize the game
 init();
