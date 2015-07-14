@@ -65,6 +65,9 @@ function setupMainChar() {
     mainChar.vx = 0;
     mainChar.vy = 0;
 
+    // Set the gravity acting upon the main char
+    mainChar.g = 3;
+
     // Set up key press listeners
     var leftArrow = keyboard(37),
         upArrow = keyboard(38),
@@ -126,14 +129,14 @@ function updateState() {
     // Check to see if the character is within the height boundaries
     if (mainChar.y > 0 && mainChar.y < yScreenBound || mainChar.y <= 0 && mainChar.vy > 0
         || mainChar.y >= yScreenBound && mainChar.vy < 0) {
-        mainChar.y += mainChar.vy;
+        mainChar.y += mainChar.vy + mainChar.g;
     } else if (mainChar.y <= 0) {
-        mainChar.y = 0;
+        mainChar.y = 0 + mainChar.g;
     } else if (mainChar.y >= yScreenBound) {
-        mainChar.y = yScreenBound;
+        mainChar.y = yScreenBound + mainChar.g;
     }
 
-    if (hitTestRectangle(mainChar, ground)) {
+    if (collision(mainChar, ground)) {
         mainChar.y = restingHeight;
     }
 }
@@ -145,7 +148,7 @@ function keyboard(keyCode) {
     key.isUp = true;
     key.press = undefined;
     key.release = undefined;
-    
+
     //The `downHandler`
     key.downHandler = function(event) {
         if (event.keyCode === key.code) {
@@ -175,7 +178,7 @@ function keyboard(keyCode) {
     return key;
 }
 
-function hitTestRectangle(r1, r2) {
+function collision(r1, r2) {
     //Define the variables we'll need to calculate
     var hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
 
