@@ -116,6 +116,7 @@ function gameLoop() {
 
 // Update the state
 function updateState() {
+
     // Check to see if the character is within the width boundaries
     if (mainChar.x > 0 && mainChar.x < xScreenBound || mainChar.x <= 0 && mainChar.vx > 0
         || mainChar.x >= xScreenBound && mainChar.vx < 0) {
@@ -129,11 +130,16 @@ function updateState() {
     // Check to see if the character is within the height boundaries
     if (mainChar.y > 0 && mainChar.y < yScreenBound || mainChar.y <= 0 && mainChar.vy > 0
         || mainChar.y >= yScreenBound && mainChar.vy < 0) {
-        mainChar.y += mainChar.vy + mainChar.g;
+        mainChar.y += mainChar.vy;
+        if (mainChar.y <= ground.y - mainChar.height) {
+            mainChar.y += mainChar.g;
+        }
     } else if (mainChar.y <= 0) {
-        mainChar.y = 0 + mainChar.g;
+        mainChar.y = 0;
     } else if (mainChar.y >= yScreenBound) {
-        mainChar.y = yScreenBound + mainChar.g;
+        mainChar.y = yScreenBound;
+    } else if (mainChar.y <= ground.y - mainChar.height) {
+        mainChar.y += mainChar.g
     }
 
     if (collision(mainChar, ground)) {
